@@ -1,7 +1,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-// Shift 3rd(?) bit on the port data direction register to set it as output
+// Shift 5th bit on the port data direction register to set it as output
 void setup_onboard_led_as_output()
 {
     DDRB |= (1 << DDB5);
@@ -31,8 +31,8 @@ int main(void)
     for(;;)
     {
         onboard_led_on();
-        _delay_ms(500);
+        _delay_ms(250);
         onboard_led_off();
-        _delay_ms(500);
+        _delay_ms(750);
     }
 }

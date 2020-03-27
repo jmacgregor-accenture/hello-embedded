@@ -13,26 +13,41 @@ void onboard_led_on()
     PORTB |= (1 << PORTB5);
 }
 
-// I actually have no idea what the & is doing, exactly
-// right right-hand side is shifting the 5th bit in the opposite 
-// direction as before
-// but instead of piping that to make an assignment, we make the 
-// port = 0 because current value of portb and the ~'d result of the 
-// 5th bit are not equal
+// Take the current bit values of PORTB, then get the complement of shifting the 5th bit.
+// Then, use the bitwise AND to assign a new value to PORTB
+// Bitwise AND combined with the complement value will leave all current 1 values unchanged but set all others to 0 
 void onboard_led_off()
 {
     PORTB &= ~(1 << PORTB5);
 }
 
+void setup_offboard_led()
+{
+    DDRB |= (1 << DDB4);
+}
+
+void offboard_led_on()
+{
+    PORTB |= (1 << PORTB4);
+}
+
+void offboard_led_off()
+{
+    PORTB &= ~(1 << PORTB4);
+}
+
 int main(void)
 {
     setup_onboard_led_as_output();
+    setup_offboard_led();
 
     for(;;)
     {
+        offboard_led_off();
         onboard_led_on();
-        _delay_ms(250);
+        _delay_ms(500);
+        offboard_led_on();
         onboard_led_off();
-        _delay_ms(750);
+        _delay_ms(500);
     }
 }

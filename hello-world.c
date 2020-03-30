@@ -1,53 +1,74 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-// Shift 5th bit on the port data direction register to set it as output
-void setup_onboard_led_as_output()
+// Shift the passed bit on the port data direction register to set it as output
+void setup_bit_as_output(int bit)
 {
-    DDRB |= (1 << DDB5);
+    if (bit == 5)
+    {
+        DDRB |= (1 << DDB5);
+    }
+    else if (bit == 4)
+    {
+        DDRB |= (1 << DDB4);
+    }
+    else if (bit == 2)
+    {
+        DDRB |= (1 << DDB4);
+    }
 }
 
-// Shift 5th bit to power the port
-void onboard_led_on()
-{
-    PORTB |= (1 << PORTB5);
-}
-
-// Take the current bit values of PORTB, then get the complement of shifting the 5th bit.
+// Take the current bit values of PORTB, then get the complement of shifting the passed bit.
 // Then, use the bitwise AND to assign a new value to PORTB
-// Bitwise AND combined with the complement value will leave all current 1 values unchanged but set all others to 0 
-void onboard_led_off()
+// Bitwise AND combined with the complement value will leave all current 1 values unchanged but set all others to 0
+void switch_power_off(int bit)
 {
-    PORTB &= ~(1 << PORTB5);
+    if (bit == 5)
+    {
+        PORTB &= ~(1 << PORTB5);
+    }
+    else if (bit == 4)
+    {
+        PORTB &= ~(1 << PORTB4);
+    }
+    else if (bit == 2)
+    {
+        PORTB &= ~(1 << PORTB2);
+    }
 }
 
-void setup_offboard_led()
+// Shift the passed bit to power the port
+void switch_power_on(int bit)
 {
-    DDRB |= (1 << DDB4);
-}
-
-void offboard_led_on()
-{
-    PORTB |= (1 << PORTB4);
-}
-
-void offboard_led_off()
-{
-    PORTB &= ~(1 << PORTB4);
+    if (bit == 5)
+    {
+        PORTB |= (1 << PORTB5);
+    }
+    else if (bit == 4)
+    {
+        PORTB |= (1 << PORTB4);
+    }
+    else if (bit == 2)
+    {
+        PORTB |= (1 << PORTB2);
+    }
 }
 
 int main(void)
 {
-    setup_onboard_led_as_output();
-    setup_offboard_led();
+    setup_bit_as_output(5);
+    setup_bit_as_output(4);
+    setup_bit_as_output(2);
 
     for(;;)
     {
-        offboard_led_off();
-        onboard_led_on();
+        switch_power_on(5);
+        switch_power_off(4);
+        switch_power_on(2);
         _delay_ms(500);
-        offboard_led_on();
-        onboard_led_off();
+        switch_power_off(5);
+        switch_power_on(4);
+        switch_power_off(2);
         _delay_ms(500);
     }
 }

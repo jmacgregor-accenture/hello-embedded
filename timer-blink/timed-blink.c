@@ -57,18 +57,13 @@ void switch_power_on(int bit)
 int main(void)
 {
     setup_bit_as_output(5);
-    setup_bit_as_output(4);
-    setup_bit_as_output(2);
+    // setup timer
 
     for(;;)
     {
+        // do some timer math
+        // set it to toggle rather than on and off?
         switch_power_on(5);
-        switch_power_off(4);
-        switch_power_on(2);
-        _delay_ms(500);
         switch_power_off(5);
-        switch_power_on(4);
-        switch_power_off(2);
-        _delay_ms(500);
     }
 }

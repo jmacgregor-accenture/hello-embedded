@@ -78,9 +78,15 @@ int main(void)
 {
     setup_bit_as_output(5);
 
+    TCCR1B |= (1 << CS10); // How do we know to use this clock source??
+
     for(;;)
     {
-        _delay_ms(2000);
-        toggle_led(5);
+
+        if (TCNT1 >= 49999)
+        {
+            toggle_led(5);
+            TCNT1 = 0;
+        }
     }
 }

@@ -1,5 +1,8 @@
 #include <avr/io.h>
 #include <util/delay.h>
+#include <stdbool.h>
+
+bool light_on;
 
 // Shift the passed bit on the port data direction register to set it as output
 void setup_bit_as_output(int bit)
@@ -35,6 +38,8 @@ void switch_power_off(int bit)
     {
         PORTB &= ~(1 << PORTB2);
     }
+
+    light_on = false;
 }
 
 // Shift the passed bit to power the port
@@ -52,18 +57,30 @@ void switch_power_on(int bit)
     {
         PORTB |= (1 << PORTB2);
     }
+
+    light_on = true;
+}
+
+void toggle_led(int bit)
+{
+    if (light_on)
+    {
+        switch_power_off(bit);
+    }
+    else
+    {
+        switch_power_on(bit);
+    }
+    
 }
 
 int main(void)
 {
     setup_bit_as_output(5);
-    // setup timer
 
     for(;;)
     {
-        // do some timer math
-        // set it to toggle rather than on and off?
-        switch_power_on(5);
-        switch_power_off(5);
+        _delay_ms(2000);
+        toggle_led(5);
     }
 }

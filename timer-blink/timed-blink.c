@@ -1,6 +1,8 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdbool.h>
+#include <avr/interrupt.h>
+#include <avr/sleep.h>
 
 bool light_on;
 
@@ -15,19 +17,32 @@ void toggle_led()
     PORTB ^= (1 << PORTB5);
 }
 
+ISR(TIMER1_OVF_vect)        // interrupt service routine
+{
+    toggle_led();
+}
+
+void timer_setup()
+{
+    TCCR1A = 0x00;
+    TCCR1B |= (1 << CS10);
+    TIMSK1 = (1 << TOIE1);
+}
+
 int main(void)
 {
     setup_onboard_led_as_output();
 
-    TCCR1B |= (1 << CS10);
+    cli();
+    timer_setup();
+    sei(); // enable global interrupt
+    
+    // setting any kind of sleep mode in the loop prevents the light
+    //set_sleep_mode(SLEEP_MODE_STANDBY);
 
     for(;;)
     {
-
-        if (TCNT1 >= 49999)
-        {
-            toggle_led();
-            TCNT1 = 0;
-        }
+        //sleep_mode();
+        //sei();
     }
 }

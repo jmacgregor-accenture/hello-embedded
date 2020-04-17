@@ -17,32 +17,28 @@ void toggle_led()
     PORTB ^= (1 << PORTB5);
 }
 
-ISR(TIMER1_OVF_vect)        // interrupt service routine
+ISR(TIMER1_OVF_vect) // interrupt service routine
 {
     toggle_led();
 }
 
 void timer_setup()
 {
-    TCCR1A = 0x00;
-    TCCR1B |= (1 << CS10);
-    TIMSK1 = (1 << TOIE1);
+    cli();
+    TCCR1A = 0x00; // Clear the A side register
+    TCCR1B |= (1 << CS12); // use setting 12 to achieve ~1 sec overflow
+    TIMSK1 = (1 << TOIE1); // enable overflow intterup on timer1 interrupt mask
+    sei();
 }
 
 int main(void)
 {
     setup_onboard_led_as_output();
-
-    cli();
     timer_setup();
-    sei(); // enable global interrupt
-    
-    // setting any kind of sleep mode in the loop prevents the light
-    //set_sleep_mode(SLEEP_MODE_STANDBY);
+    set_sleep_mode(SLEEP_MODE_IDLE); // lowest energy mode that keeps timer1 running
 
     for(;;)
     {
-        //sleep_mode();
-        //sei();
+        sleep_mode();
     }
 }

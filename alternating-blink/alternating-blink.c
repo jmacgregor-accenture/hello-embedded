@@ -8,7 +8,7 @@ const int LED_ON_SECOND = 1;
 const int LED_OFF_SECOND = 3;
 const unsigned int TICKS_PER_SECOND = 15624; // ticks per second at 16mhz & 1024 prescaler
 unsigned int ONE_SECOND_TICKS = LED_ON_SECOND * TICKS_PER_SECOND; 
-unsigned int THREE_SECOND_TICKS = LED_OFF_SECOND * TICKS_PER_SECOND;
+unsigned int THREE_SECOND_TICKS = LED_OFF_SECOND * TICKS_PER_SECOND; // signed ints will overflow
 
 // Shift the passed bit on the port data direction register to set it as output
 void setup_onboard_led_as_output()

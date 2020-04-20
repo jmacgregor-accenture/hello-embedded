@@ -15,33 +15,28 @@ void toggle_led()
     PORTB ^= (1 << PORTB5);
 }
 
-ISR(TIMER1_OVF_vect) // interrupt service routine
+ISR(TIMER1_COMPA_vect) // interrupt service routine
 {
     toggle_led();
 }
 
-void timer_setup(bool fastBlink)
+void timer_setup()
 {
     cli(); // clear interrupts
     TCCR1A = 0x00; // Clear the A side register
 
-    if (fastBlink)
-    {
-        TCCR1B |= ((1 << CS10) | (1 << CS11)); // 1/64 prescaler to make overflow ~.25 second
-    }
-    else
-    {
-        TCCR1B |= (1 << CS12); // 1/256 prescaler to make overflow ~1 second
-    }
+    TCCR1B |= (1 << WGM12); // configure CTC mode
+    OCR1A = 15624; // set ticks per second
+    TCCR1B |= ((1 << CS12) | (1 << CS10)); // 1/1024 prescaler to make overflow ~4 seconds
     
-    TIMSK1 = (1 << TOIE1); // enable overflow interrupt on timer1 interrupt mask
+    TIMSK1 = (1 << OCIE1A); // enable CTC interrupt on timer1 interrupt mask
     sei();
 }
 
 int main(void)
 {
     setup_onboard_led_as_output();
-    timer_setup(false);
+    timer_setup();
     set_sleep_mode(SLEEP_MODE_IDLE); // lowest energy mode that keeps timer1 running
 
     for(;;)

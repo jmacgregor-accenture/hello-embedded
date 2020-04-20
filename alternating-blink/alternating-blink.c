@@ -20,16 +20,22 @@ ISR(TIMER1_COMPA_vect) // interrupt service routine
     toggle_led();
 }
 
+ISR(TIMER1_COMPB_vect) // interrupt service routine
+{
+    toggle_led();
+}
+
 void timer_setup()
 {
     cli(); // clear interrupts
     TCCR1A = 0x00; // Clear the A side register
 
-    TCCR1B |= (1 << WGM12); // configure CTC mode
+    TCCR1B |= ((1<< WGM13) | (1 << WGM12)); // configure CTC mode
     OCR1A = 15624; // set ticks per second
+    OCR1B = 62496; // set ticks per 3 seconds
     TCCR1B |= ((1 << CS12) | (1 << CS10)); // 1/1024 prescaler to make overflow ~4 seconds
     
-    TIMSK1 = (1 << OCIE1A); // enable CTC interrupt on timer1 interrupt mask
+    TIMSK1 |= ((1 << OCIE1A) | (1 << OCIE1B)); // enable CTC interrupt on timer1 interrupt mask
     sei();
 }
 

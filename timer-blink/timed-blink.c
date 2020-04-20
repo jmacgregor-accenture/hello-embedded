@@ -1,10 +1,8 @@
 #include <avr/io.h>
 #include <util/delay.h>
-#include <stdbool.h>
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
-
-bool light_on;
+#include <stdbool.h>
 
 // Shift the passed bit on the port data direction register to set it as output
 void setup_onboard_led_as_output()
@@ -22,19 +20,28 @@ ISR(TIMER1_OVF_vect) // interrupt service routine
     toggle_led();
 }
 
-void timer_setup()
+void timer_setup(bool fastBlink)
 {
-    cli();
+    cli(); // clear interrupts
     TCCR1A = 0x00; // Clear the A side register
-    TCCR1B |= (1 << CS12); // use setting 12 to achieve ~1 sec overflow
-    TIMSK1 = (1 << TOIE1); // enable overflow intterup on timer1 interrupt mask
+
+    if (fastBlink)
+    {
+        TCCR1B |= ((1 << CS10) | (1 << CS11)); // 1/64 prescaler to make overflow ~.25 second
+    }
+    else
+    {
+        TCCR1B |= (1 << CS12); // 1/256 prescaler to make overflow ~1 second
+    }
+    
+    TIMSK1 = (1 << TOIE1); // enable overflow interrupt on timer1 interrupt mask
     sei();
 }
 
 int main(void)
 {
     setup_onboard_led_as_output();
-    timer_setup();
+    timer_setup(false);
     set_sleep_mode(SLEEP_MODE_IDLE); // lowest energy mode that keeps timer1 running
 
     for(;;)
